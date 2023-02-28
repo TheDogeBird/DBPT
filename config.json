@@ -1,53 +1,68 @@
 {
-  "api_key": "PUT YOUR KEY HERE BRO",
+  "api_key": "PUT YOUR KEY HERE BROSKIs",
   "model_engine": "models/dls/gpt2-medium",
   "temperature": 0.42,
-  "max_tokens": 69,
+  "max_tokens": 256,
   "stop": ["\n", "Human:"],
   "max_new_tokens": 10,
-
+  "log_conversations": true,
   "conversational_flows": {
-    "greetings": [
-      "hello",
-      "hi",
-      "hey",
-      "greetings",
-      "what's up",
-      "good morning",
-      "good afternoon",
-      "good evening"
-    ],
-    "farewells": [
-      "bye",
-      "goodbye",
-      "see you later",
-      "talk to you later"
-    ],
-    "thanks": [
-      "thank you",
-      "thanks",
-      "much appreciated"
-    ],
-    "yes": [
-      "yes",
-      "sure",
-      "absolutely",
-      "definitely",
-      "for sure",
-      "no problem",
-      "ok",
-      "alright",
-      "fine",
-      "good"
-    ],
-    "no": [
-      "no",
-      "nope",
-      "sorry",
-      "unfortunately",
-      "not really",
-      "not sure",
-      "not"
-    ]
+    "greetings": {
+      "trigger_phrases": [
+        "hello",
+        "hi",
+        "hey",
+        "greetings",
+        "what's up",
+        "good morning",
+        "good afternoon",
+        "good evening"
+      ],
+      "response": "Hello there! How can I assist you today?"
+    },
+    "farewells": {
+      "trigger_phrases": [
+        "bye",
+        "goodbye",
+        "see you later",
+        "talk to you later"
+      ],
+      "response": "Goodbye! Have a nice day."
+    },
+    "thanks": {
+      "trigger_phrases": [
+        "thank you",
+        "thanks",
+        "much appreciated"
+      ],
+      "response": "You're welcome!"
+    },
+    "yes": {
+      "trigger_phrases": [
+        "yes",
+        "sure",
+        "absolutely",
+        "definitely",
+        "for sure",
+        "no problem",
+        "ok",
+        "alright",
+        "fine",
+        "good"
+      ],
+      "response": "Great!"
+    },
+    "no": {
+      "trigger_phrases": [
+        "no",
+        "nope",
+        "sorry",
+        "unfortunately",
+        "not really",
+        "not sure",
+        "not"
+      ],
+      "response": "I see."
+    }
   }
 }
