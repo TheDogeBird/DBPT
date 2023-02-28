@@ -4,5 +4,50 @@
   "temperature": 0.42,
   "max_tokens": 69,
   "stop": ["\n", "Human:"],
-  "max_new_tokens": 10
+  "max_new_tokens": 10,
+
+  "conversational_flows": {
+    "greetings": [
+      "hello",
+      "hi",
+      "hey",
+      "greetings",
+      "what's up",
+      "good morning",
+      "good afternoon",
+      "good evening"
+    ],
+    "farewells": [
+      "bye",
+      "goodbye",
+      "see you later",
+      "talk to you later"
+    ],
+    "thanks": [
+      "thank you",
+      "thanks",
+      "much appreciated"
+    ],
+    "yes": [
+      "yes",
+      "sure",
+      "absolutely",
+      "definitely",
+      "for sure",
+      "no problem",
+      "ok",
+      "alright",
+      "fine",
+      "good"
+    ],
+    "no": [
+      "no",
+      "nope",
+      "sorry",
+      "unfortunately",
+      "not really",
+      "not sure",
+      "not"
+    ]
+  }
 }
