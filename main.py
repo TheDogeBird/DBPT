@@ -63,6 +63,9 @@ class ChatGPT:
         # Set up conversational flows
         self.conversational_flows = config.get("conversational_flows", [])
 
+        # Set up max_length for generation
+        self.max_length = config.get("max_length", 50)
+
     def get_last_user_message(self):
         conn = sqlite3.connect(self.db_path)
         c = conn.cursor()
@@ -114,7 +117,7 @@ class ChatGPT:
         sentiment = "positive" if probs[0][1] > 0.5 else "negative"
         return sentiment
 
-    def generate_response(self, user_input):
+    def generate_response(self, user_input, max_length=None):
         # Clean user input
         user_input = self.process_user_input(user_input)
 
@@ -134,21 +137,23 @@ class ChatGPT:
         conn.commit()
         conn.close()
 
-        # Check if user input matches a topic
-        response = None
-        for topic, keywords in self.conversational_flows.items():
-            for keyword in keywords:
-                if keyword in user_input:
-                    response = topic
-                    break
-            if response is not None:
-                break
-
         # Generate bot response
-        if response is None:
-            bot_response = self.get_conversation_flow_response(user_input, last_user_message, last_user_sentiment)
+        input_ids = self.tokenizer.encode(user_input, return_tensors="pt")
+        input_ids = input_ids.to(self.device)
+        if max_length is not None:
+            max_length = int(max_length)
         else:
-            bot_response = self.generate_topic_response(response)
+            max_length = self.model.config.max_length
+        sample_outputs = self.model.generate(
+            input_ids,
+            do_sample=True,
+            max_length=max_length,
+            top_k=50,
+            top_p=0.95,
+            num_return_sequences=1
+        )
+
+        bot_response = self.tokenizer.decode(sample_outputs[0], skip_special_tokens=True)
 
         # Save bot response to database
         conn = sqlite3.connect(self.db_path)
@@ -170,39 +175,29 @@ class ChatGPT:
         conn.commit()
         conn.close()
 
-    def generate_topic_response(self, topic):
-        # Clean topic
-        topic = self.process_user_input(topic)
-
-        # Generate bot response
-        input_ids = self.tokenizer.encode(topic, return_tensors="pt")
-        input_ids = input_ids.to(self.device)
-        max_length = random.randint(50, 100)
-        sample_outputs = self.model.generate(
-            input_ids,
-            do_sample=True,
-            max_length=max_length,
-            top_k=50,
-            top_p=0.95,
-            num_return_sequences=1
-        )
-
-        bot_response = self.tokenizer.decode(sample_outputs[0], skip_special_tokens=True)
-
-        # Save bot response to database
+    def get_conversation_flow_response(self, user_input, last_user_message, last_user_sentiment):
         conn = sqlite3.connect(self.db_path)
         c = conn.cursor()
-        timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        c.execute("INSERT INTO chat_history (bot_response, sentiment, timestamp) VALUES (?, ?, ?)",
-                  (bot_response, "", timestamp))
-        conn.commit()
+        query = "SELECT * FROM conversation_flows WHERE trigger_phrase=?"
+        c.execute(query, (last_user_message,))
+        result = c.fetchone()
+        if result is None:
+            query = "SELECT * FROM conversation_flows WHERE trigger_phrase IS NULL ORDER BY RANDOM() LIMIT 1"
+            c.execute(query)
+            result = c.fetchone()
+        response = result[1]
+        if response == "input":
+            response = self.generate_response(user_input)
+        elif response == "repeat":
+            response = self.generate_response(last_user_message)
+        elif response == "same_topic":
+            response = self.generate_response(last_user_message + " " + user_input)
+        elif response == "switch_topic":
+            response = self.generate_response(user_input)
         conn.close()
 
-        return bot_response
+        return response
 
-    def get_conversation_flow_response(self, user_input, last_user_message, last_user_sentiment):
-        # Add code here to generate a response based on the conversation flow
-        return self.generate_response(user_input)
 
     def run(self):
         print("Chatbot started, type 'exit' to exit.")
@@ -213,6 +208,14 @@ class ChatGPT:
             response = self.generate_response(user_input)
             print("Bot:", response)
 
+    def run(self):
+        print("Chatbot started, type 'exit' to exit.")
+        while True:
+            user_input = input("You: ")
+            if user_input.strip().lower() == "exit":
+                break
+            response = self.generate_response(user_input)
+            print("Bot:", response)
 
 if __name__ == "__main__":
     chatbot = ChatGPT(config_path="config.json")
