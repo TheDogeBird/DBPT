@@ -60,6 +60,9 @@ class ChatGPT:
         # Set up device
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+        # Set up conversational flows
+        self.conversational_flows = config.get("conversational_flows", [])
+
     def get_last_user_message(self):
         conn = sqlite3.connect(self.db_path)
         c = conn.cursor()
@@ -134,23 +137,17 @@ class ChatGPT:
         # Generate bot response
         input_ids = self.tokenizer.encode(user_input, return_tensors="pt")
         input_ids = input_ids.to(self.device)
+        max_length = random.randint(50, 100)
+        sample_outputs = self.model.generate(
+            input_ids,
+            do_sample=True,
+            max_length=max_length,
+            top_k=50,
+            top_p=0.95,
+            num_return_sequences=1
+        )
 
-        # check if user input matches a conversation flow and select appropriate response
-        response = self.get_conversation_flow_response(user_input, last_user_message, last_user_sentiment)
-        if response is not None:
-            bot_response = response
-        else:
-            max_length = random.randint(50, 100)
-            sample_outputs = self.model.generate(
-                input_ids,
-                do_sample=True,
-                max_length=max_length,
-                top_k=50,
-                top_p=0.95,
-                num_return_sequences=1
-            )
-
-            bot_response = self.tokenizer.decode(sample_outputs[0], skip_special_tokens=True)
+        bot_response = self.tokenizer.decode(sample_outputs[0], skip_special_tokens=True)
 
         # Save bot response to database
         conn = sqlite3.connect(self.db_path)
@@ -172,6 +169,30 @@ class ChatGPT:
         conn.commit()
         conn.close()
 
+    def get_conversation_flow_response(self, user_input, last_user_message, last_user_sentiment):
+        conn = sqlite3.connect(self.db_path)
+        c = conn.cursor()
+        query = "SELECT * FROM conversation_flows WHERE trigger_phrase=?"
+        c.execute(query, (last_user_message,))
+        result = c.fetchone()
+        if result is None:
+            query = "SELECT * FROM conversation_flows WHERE trigger_phrase IS NULL ORDER BY RANDOM() LIMIT 1"
+            c.execute(query)
+            result = c.fetchone()
+        response = result[1]
+        if response == "input":
+            response = self.generate_response(user_input)
+        elif response == "repeat":
+            response = self.generate_response(last_user_message)
+        elif response == "same_topic":
+            response = self.generate_response(last_user_message + " " + user_input)
+        elif response == "switch_topic":
+            response = self.generate_response(user_input)
+        conn.close()
+
+        return response
+
+
     def run(self):
         print("Chatbot started, type 'exit' to exit.")
         while True:
@@ -186,4 +207,3 @@ if __name__ == "__main__":
     if chatbot.device.type == "cuda":
         torch.cuda.empty_cache()
     chatbot.run()
-
