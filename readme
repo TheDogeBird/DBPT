@@ -1,0 +1,7 @@
+create your table from sqlite: 
+
+CREATE TABLE IF NOT EXISTS chat_history
+(user_input TEXT, bot_response TEXT, sentiment TEXT, timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP)
+
+
+make sure you add your own api key in the config
