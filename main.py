@@ -134,17 +134,23 @@ class ChatGPT:
         # Generate bot response
         input_ids = self.tokenizer.encode(user_input, return_tensors="pt")
         input_ids = input_ids.to(self.device)
-        max_length = random.randint(50, 100)
-        sample_outputs = self.model.generate(
-            input_ids,
-            do_sample=True,
-            max_length=max_length,
-            top_k=50,
-            top_p=0.95,
-            num_return_sequences=1
-        )
 
-        bot_response = self.tokenizer.decode(sample_outputs[0], skip_special_tokens=True)
+        # check if user input matches a conversation flow and select appropriate response
+        response = self.get_conversation_flow_response(user_input, last_user_message, last_user_sentiment)
+        if response is not None:
+            bot_response = response
+        else:
+            max_length = random.randint(50, 100)
+            sample_outputs = self.model.generate(
+                input_ids,
+                do_sample=True,
+                max_length=max_length,
+                top_k=50,
+                top_p=0.95,
+                num_return_sequences=1
+            )
+
+            bot_response = self.tokenizer.decode(sample_outputs[0], skip_special_tokens=True)
 
         # Save bot response to database
         conn = sqlite3.connect(self.db_path)
