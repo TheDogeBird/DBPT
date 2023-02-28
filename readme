@@ -1,10 +1,46 @@
-create your table from sqlite: 
+Chatbot User Manual
+This manual is designed to help you get started with the Chatbot application. The Chatbot is a natural language processing program that engages in conversation with users, responding to their inputs and queries. The Chatbot is built using the GPT-2 language model and BERT sentiment analysis model.
 
-CREATE TABLE IF NOT EXISTS chat_history
-(user_input TEXT, bot_response TEXT, sentiment TEXT, timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP)
+Getting Started
+To get started, you will need to clone the project from Github and install the required dependencies using pip. Here are the steps to follow:
 
+Clone the repository from Github:
 
-make sure you add your own api key in the config
+bash
+Copy code
+git clone https://github.com/[username]/[repository-name].git
+Navigate to the project directory:
 
-p.s.
-I didn't do shit bro
+bash
+Copy code
+cd [repository-name]
+Install the required dependencies using pip:
+
+Copy code
+pip install -r requirements.txt
+Run the Chatbot application:
+
+css
+Copy code
+python main.py
+Using the Chatbot
+Once you have launched the Chatbot application, you can start chatting with the Chatbot. The Chatbot will respond to your inputs and queries in a conversational manner.
+
+To exit the Chatbot application, type "exit" and press Enter.
+
+Configuring the Chatbot
+The Chatbot can be configured using the config.json file located in the project directory. Here are some of the options that can be configured:
+
+model_engine: The GPT-2 model to use for the Chatbot.
+conversational_flows: Predefined conversational flows that the Chatbot can use to guide the conversation.
+seed: The random seed to use for reproducibility.
+api_key: The API key to use for external services (not currently used).
+Modifying the Chatbot
+If you want to modify the Chatbot, you can edit the main.py file located in the project directory. Here are some of the functions that can be modified:
+
+process_user_input: This function processes the user input before passing it to the Chatbot.
+classify_sentiment: This function classifies the sentiment of the user input using the BERT model.
+generate_response: This function generates the response of the Chatbot to the user input using the GPT-2 model.
+run: This function runs the Chatbot application.
+Conclusion
+The Chatbot is a powerful natural language processing program that can engage in conversation with users in a conversational manner. With its configurable options and modifiable functions, the Chatbot is a flexible and customizable tool for a variety of applications.
