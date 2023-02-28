@@ -1,5 +1,5 @@
 {
-  "api_key": "PUT YOUR KEY HERE BROSKIs",
+  "api_key": "PUT YOUR STUFF HERE",
   "model_engine": "models/dls/gpt2-medium",
   "temperature": 0.42,
   "max_tokens": 256,

@@ -5,6 +5,7 @@ import sqlite3
 from datetime import datetime
 import torch
 import transformers
+from flask import Flask, request, render_template
 
 
 # Define constants
@@ -13,9 +14,12 @@ BERT_DIR = "models/bert"
 
 
 class ChatGPT:
-    def __init__(self, config_path="config.json", model=None, tokenizer=None, db_path="chathis.db"):
+    def __init__(self, config_path="config.json", model=None, tokenizer=None, db_path="newdb.db"):
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.config_path = config_path
+        self.db_path = db_path
+        self.app = Flask(__name__)
+
         # Load config file
         with open(config_path) as f:
             config = json.load(f)
@@ -65,6 +69,20 @@ class ChatGPT:
 
         # Set up max_length for generation
         self.max_length = config.get("max_length", 50)
+
+        # set up routes
+        @self.app.route("/")
+        def home():
+            return render_template("index.html")
+
+        @self.app.route("/get_response")
+        def get_response():
+            user_input = request.args.get("msg")
+            response = self.generate_response(user_input)
+            return response
+
+        # run Flask app
+        self.app.run()
 
     def get_last_user_message(self):
         conn = sqlite3.connect(self.db_path)
@@ -139,13 +157,16 @@ class ChatGPT:
 
         # Generate bot response
         input_ids = self.tokenizer.encode(user_input, return_tensors="pt")
+        attention_mask = torch.ones(input_ids.shape, dtype=torch.long, device=self.device)
         input_ids = input_ids.to(self.device)
+        attention_mask = attention_mask.to(self.device)
         if max_length is not None:
             max_length = int(max_length)
         else:
-            max_length = self.model.config.max_length
+            max_length = self.max_length
         sample_outputs = self.model.generate(
             input_ids,
+            attention_mask=attention_mask,
             do_sample=True,
             max_length=max_length,
             top_k=50,
@@ -198,24 +219,26 @@ class ChatGPT:
 
         return response
 
-
     def run(self):
         print("Chatbot started, type 'exit' to exit.")
         while True:
-            user_input = input("You: ")
-            if user_input.strip().lower() == "exit":
-                break
-            response = self.generate_response(user_input)
-            print("Bot:", response)
+            # Get user input from web interface
+            user_input = request.args.get("msg")
 
-    def run(self):
-        print("Chatbot started, type 'exit' to exit.")
-        while True:
-            user_input = input("You: ")
+            # Exit if user types "exit"
             if user_input.strip().lower() == "exit":
                 break
+
+            # Generate response and save to database
             response = self.generate_response(user_input)
-            print("Bot:", response)
+            last_user_message = self.get_last_user_message()
+            last_user_sentiment = self.classify_sentiment(last_user_message) if last_user_message else ""
+            sentiment = self.classify_sentiment(response)
+            self.save_to_database(last_user_message, response, sentiment)
+
+            # Return response as JSON object
+            response_dict = {"response": response}
+            return response_dict
 
 if __name__ == "__main__":
     chatbot = ChatGPT(config_path="config.json")
