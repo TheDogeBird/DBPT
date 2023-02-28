@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Chatbot Demo</title>
+  </head>
+  <body>
+    <div id="chat-container">
+      <div id="chat-log"></div>
+      <input type="text" id="chat-input" placeholder="Enter your message...">
+      <button id="chat-submit">Send</button>
+    </div>
+
+    <script>
+      var chatLog = document.getElementById("chat-log");
+      var chatInput = document.getElementById("chat-input");
+      var chatSubmit = document.getElementById("chat-submit");
+
+      chatSubmit.addEventListener("click", function() {
+        var userInput = chatInput.value;
+        chatLog.innerHTML += "<p><strong>You:</strong> " + userInput + "</p>";
+        chatInput.value = "";
+
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function() {
+          if (xhr.readyState === 4 && xhr.status === 200) {
+            var botResponse = xhr.responseText;
+            chatLog.innerHTML += "<p><strong>Bot:</strong> " + botResponse + "</p>";
+          }
+        };
+        xhr.open("GET", "/get_response?msg=" + encodeURIComponent(userInput), true);
+        xhr.send();
+      });
+    </script>
+  </body>
+</html>
