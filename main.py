@@ -9,8 +9,6 @@ import transformers
 from flask import Flask, request, render_template, jsonify
 from flask_compress import Compress
 from flask_caching import Cache
-from threading import Thread
-
 
 # Set up Flask app
 app = Flask(__name__)
@@ -50,7 +48,6 @@ class ChatGPT:
         return bot_response or ''
 
     def __init__(self, config_path="config.json", model=None, tokenizer=None, db_path="newdb.db"):
-        self.get_response_async = None
         self.last_bot_response = None
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.config_path = config_path
@@ -125,18 +122,17 @@ class ChatGPT:
         def home():
             return render_template("index.html")
 
-        def get_response_async(self, message):
-            response = self.generate_response(message)
-            self.responses[message] = response
-
-        @self.app.route('/get_response/<message_id>')
+        @self.app.route('/get_response', methods=['GET', 'POST'])
         @self.compress.compressed()
-        def get_response_by_id(message_id):
-            response = self.responses.get(message_id)
-            if response is not None:
+        def get_response():
+            if request.method == 'GET':
+                message = request.args.get('msg')
+                response = self.generate_response(message)
                 return jsonify({'response': response})
-            else:
-                return jsonify({'response': 'Response not found.'})
+            elif request.method == 'POST':
+                message = request.form['msg']
+                response = self.generate_response(message)
+                return jsonify({'response': response})
 
         def generate_response(self, user_input):
             input_ids = self.tokenizer.encode(user_input, return_tensors="pt")
