@@ -1,5 +1,5 @@
 {
-  "api_key": "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",
+  "api_key": "your key",
   "model_engine": "./models/dls/gpt2-medium",
   "temperature": 0.7,
   "max_length": 100,
