@@ -6,13 +6,13 @@ function sendMessage() {
   // clear input field
   $('#user-input').val('');
   // send user input to server for processing
- $.ajax({
+  $.ajax({
     type: 'POST',
     url: '/get_response',
     data: {'msg': userInput},
     success: function(data) {
       // append response from server to chat log
-      $('#chat-log').append('<div class="chat-message chat-bot"><p>' + data['response'] + '</p></div>');
+      $('#chat-log').append(data);
       // scroll to bottom of chat log
       $('#chat-log').scrollTop($('#chat-log')[0].scrollHeight);
     },
@@ -22,11 +22,3 @@ function sendMessage() {
     }
   });
 }
-
-$(document).ready(function() {
-  // send message when form is submitted
-  $('#message-form').submit(function(event) {
-    event.preventDefault(); // prevent default form submit action
-    sendMessage();
-  });
-});
