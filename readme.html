@@ -1,7 +1,7 @@
 [Icadoa Chatbot]
 Welcome to the Icadoa Chatbot, a conversational AI model based on GPT-2 and BERT models. The chatbot is trained to respond to user inputs in natural language.
 
-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
+--------------------------------------------------------------~-
 
 [Getting Started]
 Prerequisites
@@ -10,44 +10,47 @@ PyTorch 1.6.0 or later
 Transformers 3.0.0 or later
 Flask 1.1.2 or later (optional)
 
-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
+--------------------------------------------------------------~-
 
 [Installation]
 Clone this repository to your local machine using git clone https://github.com/username/Icadoa.git.
 Install the required packages by running pip install -r requirements.txt in the project directory.
 
-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
+--------------------------------------------------------------~-
 
 [Usage]
 The chatbot can be run by executing the main.py script:
 python main.py
 
-Once the chatbot is running, simply type in your message and hit Enter to receive a response from the chatbot.\
+Once the chatbot is running, simply type in your message and hit Enter to receive a response from the chatbot.
 You can also integrate the chatbot into a web application by running the Flask server:
 python app.py
 
 Once the server is running, you can access the chatbot interface by visiting http://localhost:5000 in your web browser.
 
-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
+[Features]
 
+Updated model engine to GPT-2 Large for improved accuracy and fluency in responses.
+Added support for conversational flows, allowing the chatbot to follow predefined paths based on user inputs.
+Added caching functionality for faster response times and reduced server load.
+Improved the chatbot's natural language processing capabilities by fine-tuning on a custom dataset.
+Implemented a compression middleware to reduce response size and improve page load times.
+Added support for both GET and POST requests to the /get_response endpoint.
 [Configuration]
 The chatbot can be configured by modifying the config.json file in the project directory. The following parameters can be modified:
 
-model_engine: The GPT-2 model to use (default: gpt2-medium).
+model_engine: The GPT-2 model to use (default: gpt2-large).
 seed: The random seed to use for reproducibility (default: 42).
 conversational_flows: A list of conversational flows to use (default: []).
 api_key: The API key to use for external services (default: null).
+
 Conversational Flows
 Conversational flows are predefined paths that the chatbot can take based on user inputs. They are defined in the config.json file under the conversational_flows key. Each conversational flow has a trigger_phrase and a response.
 
 The trigger_phrase is a string that the user can enter to initiate the conversational flow. The response is the chatbot's response to the trigger phrase.
 
-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
-
 [Acknowledgments]
 The Icadoa Chatbot was created by [Your Name] as a project for [Course Name]. It is based on the GPT-2 and BERT models developed by OpenAI and Google, respectively.
-
-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
 
 [License]
 This project is licensed under the MIT License - see the LICENSE.md file for details.
